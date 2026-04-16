@@ -8,6 +8,8 @@ import com.example.meuApp.service.ProductService;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.validation.BindingResult;
+import jakarta.validation.Valid;
 
 import com.example.meuApp.model.carro;
 
@@ -30,24 +32,30 @@ public class ProductController {
     }
 
     @PostMapping("/carro/save")
-    public String postMethodName(@ModelAttribute("product") carro product) {
+    public String save(@ModelAttribute("product") @Valid carro product,
+                       BindingResult result,
+                       Model model) {
+
+        // 🔥 validação
+        if (result.hasErrors()) {
+            model.addAttribute("product", product);
+            return "carros/create";
+        }
+
         productService.saveProduct(product);
         return "redirect:/carro";
-
     }
 
-     @GetMapping("/carro/delete/{id}")
+    @GetMapping("/carro/delete/{id}")
     public String delete(@PathVariable Long id) {
         this.productService.deleteProductById(id);
         return "redirect:/carro";
     }
 
-   @GetMapping("/carro/edit/{id}")
+    @GetMapping("/carro/edit/{id}")
     public String edit(@PathVariable Long id, Model model) {
         carro product = productService.getProductById(id);
         model.addAttribute("product", product);
         return "carros/edit";
     }
-
-
 }

@@ -1,58 +1,62 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
-<head>
-  <meta charset="ISO-8859-1" />
-  <title>Listagem de Carros</title>
-
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
-    integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous" />
-
-</head>
+<!-- HEAD -->
+<th:block th:replace="fragments/head :: head('Listagem de Carros')"></th:block>
 
 <body>
 
-  <div class="container pt-5">
+<!-- HEADER -->
+<th:block th:replace="fragments/head :: header()"></th:block>
+
+<div class="container pt-5">
 
     <a th:href="@{/carro/create}" class="btn btn-primary mb-3">
-      Cadastrar Carro
+        Cadastrar Carro
     </a>
 
     <h1>Listagem de Carros</h1>
 
     <table class="table table-striped">
 
-      <thead>
-        <tr>
-          <th scope="col">Nome</th>
-          <th scope="col">Descrição</th>
-          <th scope="col">Preço</th>
-          <th scope="col">Estoque</th>
-          <th scope="col">Excluir</th>
-        </tr>
-      </thead>
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Descrição</th>
+                <th>Preço</th>
+                <th>Estoque</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
 
-      <tbody>
+        <tbody>
+            <tr th:each="product : ${productsList}">
+                <td th:text="${product.name}"></td>
+                <td th:text="${product.description}"></td>
+                <td th:text="${product.price}"></td>
+                <td th:text="${product.stock}"></td>
 
-        <tr th:each="product : ${productsList}">
-          <td th:text="${product.name}"></td>
-          <td th:text="${product.description}"></td>
-          <td th:text="${product.price}"></td>
-          <td th:text="${product.stock}"></td>
-          <td>
-            <a th:href="@{/carro/delete/{id}(id=${product.id})}">Deletar</a>
-          </td>
-          <td>
-            <a th:href="@{/carro/edit/{id}(id=${product.id})}">Editar</a>
-          </td>
-        </tr>
+                <td>
+                    <a th:href="@{/carro/edit/{id}(id=${product.id})}"
+                       class="btn btn-warning btn-sm">
+                        Editar
+                    </a>
 
-      </tbody>
+                    <a th:href="@{/carro/delete/{id}(id=${product.id})}"
+                       class="btn btn-danger btn-sm"
+                       onclick="return confirm('Tem certeza que deseja excluir?')">
+                        Deletar
+                    </a>
+                </td>
+            </tr>
+        </tbody>
 
     </table>
 
-  </div>
+</div>
+
+<!-- FOOTER -->
+<th:block th:replace="fragments/footer :: footer()"></th:block>
 
 </body>
-
 </html>
