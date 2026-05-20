@@ -1,18 +1,20 @@
 package com.example.meuApp.config;
-import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 
 import org.springframework.security.core.userdetails.UserDetailsService;
+
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -32,28 +34,39 @@ public class SecurityConfig {
 
         http.authorizeHttpRequests(requests -> requests
                 .requestMatchers("/home", "/register", "/saveUser").permitAll()
-                .requestMatchers("/carro/**").hasAuthority("Admin") // 🔥 AJUSTADO
+
+                // qualquer usuário logado pode visualizar
+                .requestMatchers("/carro").authenticated()
+
+                // somente ADMIN pode criar/salvar/excluir
+                .requestMatchers("/carro/**").hasAuthority("Admin")
+
                 .anyRequest().authenticated()
         )
         .formLogin(login -> login
                 .defaultSuccessUrl("/", true)
         )
         .logout(logout -> logout
-                .logoutUrl("/logout") // 🔥 simplificado
+                .logoutUrl("/logout")
         )
         .exceptionHandling(handling -> handling
                 .accessDeniedPage("/accessDenied")
         )
-        .authenticationProvider(authenticationProvider());
+        .authenticationProvider(authenticationProvider(uds, encoder));
 
         return http.build();
     }
 
     @Bean
-    public AuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setUserDetailsService(uds);
-        provider.setPasswordEncoder(encoder);
-        return provider;
+    public AuthenticationProvider authenticationProvider(
+            UserDetailsService userDetailsService,
+            PasswordEncoder passwordEncoder) {
+
+        DaoAuthenticationProvider authProvider =
+                new DaoAuthenticationProvider(userDetailsService);
+
+        authProvider.setPasswordEncoder(passwordEncoder);
+
+        return authProvider;
     }
 }
