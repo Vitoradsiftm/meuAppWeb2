@@ -37,14 +37,11 @@ public class ProductController {
     public String save(@ModelAttribute @Valid carro product,
                        BindingResult result,
                        Model model) {
-
         System.out.println(product);
-
         if (result.hasErrors()) {
             model.addAttribute("product", product);
             return "carros/form";
         }
-
         productService.saveProduct(product);
         return "redirect:/carro";
     }
